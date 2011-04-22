@@ -1,0 +1,15 @@
+div#logo {
+	font: bold 12px verdana;
+}
+
+div#texto {
+	color: #225588;
+	font: italic 15px verdana;
+	margin-left: 147px;
+}
+
+div#wrapper {
+	font: bold 12px verdana;
+	margin: 200px auto 0;
+	width: 349px;
+}

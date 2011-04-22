@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding='UTF-8' ?>
+
+<project name="maintenance" basedir=".." default="all">
+	<echo message="Java Version: ${ant.java.version}"/>
+
+	<property file="ant/build.properties" />
+
+	<path id="build.path">
+		<fileset dir="${lib.dir}/build" includes="**.jar"/>
+	</path>
+
+	<path id="lib.path">
+		<fileset dir="${web.dir}/WEB-INF/lib" includes="**.jar"/>
+	</path>
+
+	<target name="clean">
+		<echo>Cleaning...</echo>
+		<delete dir="${dist.app.dir}" />
+		<delete dir="${war.dir}" />
+	</target>
+
+	<target name="make" depends="clean">
+		<echo>Creating directories...</echo>
+		<mkdir dir="${dist.app.dir}" />
+		<mkdir dir="${war.dir}" />
+	</target>
+
+	<target name="copy" depends="make">
+		<echo>Copying webcontent...</echo>
+		<copy todir="${dist.app.dir}">
+			<fileset dir="${web.dir}" />
+		</copy>
+	</target>
+
+	<target name="minify" depends="copy">
+		<echo>Compressing CSS...</echo>
+		<concat destfile="${dist.css.dir}/stylesheet.css" fixlastline="true">
+			<fileset dir="${dist.css.dir}" includes="*.css" excludes="stylesheet.css" />
+		</concat>
+
+		<java jar="${yuicompressor.jar}" fork="true">
+			<arg value="${dist.css.dir}/stylesheet.css" />
+			<arg value="-o" />
+			<arg value="${dist.css.dir}/stylesheet.css" />
+		</java>
+
+		<delete dir="${dist.css.dir}" excludes="stylesheet.css" />
+	</target>
+
+	<echo>Creating war...</echo>
+	<target name="war" depends="minify">
+		<war destfile="${war.file}" webxml="${dist.webinf.dir}/web.xml">
+			<zipfileset dir="${dist.app.dir}" />
+		</war>
+	</target>
+
+	<echo>Removing temp folders...</echo>
+	<target name="all" depends="war">
+		<delete dir="${dist.app.dir}" />
+	</target>
+
+</project>
